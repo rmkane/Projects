@@ -1,16 +1,14 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class AnagramSolver {
 
 	private ArrayList<String> dictionary;
 	private ArrayList<String> found;
-	private String blacklist;
-	private String whitelist;
+	private ArrayList<Character> blacklist;
+	private ArrayList<Character> whitelist;
 
 	public AnagramSolver() {
 		init();
@@ -28,36 +26,22 @@ public class AnagramSolver {
 		readFile();
 	}
 
-	private String blacklist() {
-		ArrayList<Character> list = new ArrayList<Character>();
-		String blacklist = "";
+	private ArrayList<Character> blacklist() {
+		ArrayList<Character> blacklist = new ArrayList<Character>();
 		// Special Characters and Numerals
 		for (int i = 0; i < 127; i++) {
 			if (i < 97 || i > 122) {
-				list.add((char) i);
+				blacklist.add((char) i);
 			}
 		}
-		// Append blacklisted characters to the list
-		for (int i = 0; i < list.size()-1; i++) {
-			blacklist += list.get(i) + "|";
-		}
-		blacklist += list.get(list.size()-1);
-		System.out.println(blacklist);
 		return blacklist;
 	}
-	
-	private String whitelist(String letters) {
-		ArrayList<Character> list = new ArrayList<Character>();
-		String whitelist = "";		
+
+	private ArrayList<Character> whitelist(String letters) {
+		ArrayList<Character> whitelist = new ArrayList<Character>();
 		for (int i = 0; i < letters.length(); i++) {
-			list.add(letters.charAt(i));
+			whitelist.add(letters.charAt(i));
 		}
-		// Append letters to the list
-		for (int i = 0; i < list.size()-1; i++) {
-			whitelist += list.get(i) + "|";
-		}
-		whitelist += list.get(list.size()-1);
-		System.out.println(whitelist);
 		return whitelist;
 	}
 
@@ -75,25 +59,33 @@ public class AnagramSolver {
 
 	private void solve(String letters) {
 		letters = letters.toLowerCase();
-		if (blacklist.contains(letters)) {
-			System.out.println("Sorry, these are not letters!");
-		} else {
-			whitelist = whitelist(letters);
-			for (int i = 0; i < getDictionary().size(); i++) {
-				if (getDictionary().get(i).contains(whitelist)) {
-					found.add(getDictionary().get(i));
+		whitelist = whitelist(letters);
+		for (int i = 0; i < getDictionary().size(); i++) {
+			ArrayList<Integer> valid = new ArrayList<Integer>(); 
+			for (int c = 0; c < whitelist.size(); c++) {
+				if (getDictionary().get(i).contains(Character.toString(whitelist.get(c)))) {
+					valid.add(1);
+				} else {
+					valid.add(0);
 				}
+			}
+			int checksum = 1;
+			for (Integer v : valid) {
+				checksum *= v;
+			}
+			if (checksum == 1) {
+				found.add(getDictionary().get(i));
 			}
 		}
 	}
-	
+
 	private void print() {
 		for (int i = 0; i < found.size(); i++) {
 			System.out.println(found.get(i));
 		}
 	}
-	
-	public ArrayList<String> getDictionary() {		
+
+	public ArrayList<String> getDictionary() {
 		return dictionary;
 	}
 
