@@ -1,0 +1,5 @@
+AnagramSolver:
+A program that takes in various letters from a user and looks up each word in a dictionary that conatins 3 or more of the letters that were input.
+
+MorseCode:
+A program that translates English plain-text into Morse Code. Soon to be cross-compatible.
