@@ -4,7 +4,7 @@ public class Code {
 
 	public Code(char character, String sequence) {
 		this.character = character;
-		this.sequence = " " + sequence + " ";
+		this.sequence = sequence;
 	}
 
 	public char getCharacter() {

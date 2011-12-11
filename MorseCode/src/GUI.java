@@ -1,4 +1,6 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -10,12 +12,14 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 
@@ -24,13 +28,13 @@ public class GUI extends JFrame implements MouseListener {
 	private static final long serialVersionUID = 1L;
 	private Translator translator = new Translator();
 	private JMenuBar menu;
-	private JMenu file;
-	private JMenuItem reset;
+	private JMenu file, help;
+	private JMenuItem reset, about;
 	private JPanel main_pnl;
 	private JLabel input_lbl, output_lbl;
 	private JTextArea input_txt, output_txt;
 	private JButton swap_btn, translate_btn, dictionary_btn;
-	
+
 	private final int CENTER = GridBagConstraints.CENTER;
 	private String clipboard;
 
@@ -53,7 +57,9 @@ public class GUI extends JFrame implements MouseListener {
 	public void init() {
 		menu = new JMenuBar();
 		file = new JMenu("File");
+		help = new JMenu("Help");
 		reset = new JMenuItem("Reset");
+		about = new JMenuItem("About");
 		main_pnl = new JPanel(new GridBagLayout());
 		input_lbl = new JLabel("Input English plain-text");
 		input_txt = new JTextArea(4, 36);
@@ -65,12 +71,17 @@ public class GUI extends JFrame implements MouseListener {
 
 		// Menu
 		file.setMnemonic(KeyEvent.VK_F);
+		help.setMnemonic(KeyEvent.VK_H);
 		reset.setMnemonic(KeyEvent.VK_R);
+		about.setMnemonic(KeyEvent.VK_A);
 		reset.addActionListener(new ResetListener());
+		about.addActionListener(new AboutListener());
 		this.setJMenuBar(menu);
 		menu.add(file);
+		menu.add(help);
 		file.add(reset);
-		
+		help.add(about);
+
 		// Panels
 		main_pnl.setBackground(new Color(0x8888FF));
 
@@ -142,7 +153,7 @@ public class GUI extends JFrame implements MouseListener {
 			String tmp = input_txt.getText();
 			input_txt.setText(output_txt.getText());
 			output_txt.setText(tmp);
-			
+
 			tmp = input_lbl.getText();
 			input_lbl.setText(output_lbl.getText());
 			output_lbl.setText(tmp);
@@ -161,8 +172,8 @@ public class GUI extends JFrame implements MouseListener {
 			}
 		}
 	}
-	
-	class ResetListener implements ActionListener{
+
+	class ResetListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			input_lbl.setText("Input English plain-text");
@@ -175,11 +186,48 @@ public class GUI extends JFrame implements MouseListener {
 		}
 	}
 
+	class AboutListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String title = "Instructions";
+			String instructions = "When decoding morse code into\n"
+					+ "English plain-text, use spaces\n"
+					+ "between letters and use a '+' to\n"
+					+ "add spaces between separate words.";
+			Font font = new Font("Sans", Font.PLAIN, 16);
+			MyDialog d = new MyDialog(title, instructions, font);
+			d.setSize(300, 160);
+			d.setLocationRelativeTo(null);
+			d.setVisible(true);
+		}
+	}
+
 	class DictionaryListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			new Lookup();
+			String title = "Morse Code Dictionary";
+			String dict = new Dictionary().toString();
+			Font font = new Font("Courier New", Font.BOLD, 20);
+			MyDialog d = new MyDialog(title, dict, font);
+			d.setSize(250, 500);
+			d.setLocationRelativeTo(null);
+			d.setVisible(true);
 
+		}
+	}
+
+	class MyDialog extends JDialog {
+
+		private static final long serialVersionUID = 1L;
+
+		public MyDialog(String title, String text, Font font) {
+			JTextArea txt = new JTextArea(text);
+			txt.setFont(font);
+			txt.setLineWrap(true);
+			txt.setEditable(false);
+			this.setTitle(title);
+			this.setLayout(new BorderLayout());
+			this.add(new JScrollPane(txt));
 		}
 	}
 
