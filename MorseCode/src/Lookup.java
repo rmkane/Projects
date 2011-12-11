@@ -14,10 +14,6 @@ public class Lookup {
 		d.setVisible(true);
 	}
 
-	public static void main(String[] args) {
-		new Lookup();
-	}
-
 	class LookupDialog extends JDialog {
 		
 		private static final long serialVersionUID = 1L;

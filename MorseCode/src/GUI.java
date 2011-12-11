@@ -4,27 +4,44 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 
-public class GUI extends JFrame {
+public class GUI extends JFrame implements MouseListener {
 
 	private static final long serialVersionUID = 1L;
 	private Translator translator = new Translator();
+	private JMenuBar menu;
+	private JMenu file;
+	private JMenuItem reset;
 	private JPanel main_pnl;
 	private JLabel input_lbl, output_lbl;
 	private JTextArea input_txt, output_txt;
 	private JButton swap_btn, translate_btn, dictionary_btn;
+	
 	private final int CENTER = GridBagConstraints.CENTER;
+	private String clipboard;
+
+	private enum State {
+		ENCODE, DECODE
+	};
+
+	private State mode;
 
 	public GUI() {
-		this.setSize(500, 300);
+		this.setSize(500, 400);
 		this.setTitle("Morse Code Translator");
 		this.setLocationRelativeTo(null);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -34,15 +51,26 @@ public class GUI extends JFrame {
 	}
 
 	public void init() {
+		menu = new JMenuBar();
+		file = new JMenu("File");
+		reset = new JMenuItem("Reset");
 		main_pnl = new JPanel(new GridBagLayout());
-		input_lbl = new JLabel("Input");
-		input_txt = new JTextArea("Enter English plain-text", 4, 36);
-		output_lbl = new JLabel("Output");
-		output_txt = new JTextArea("Output MorseCode", 4, 36);
+		input_lbl = new JLabel("Input English plain-text");
+		input_txt = new JTextArea(4, 36);
+		output_lbl = new JLabel("Output Morse Code");
+		output_txt = new JTextArea(4, 36);
 		swap_btn = new JButton("Swap");
 		translate_btn = new JButton("Encode");
 		dictionary_btn = new JButton("Dictionary");
 
+		// Menu
+		file.setMnemonic(KeyEvent.VK_F);
+		reset.setMnemonic(KeyEvent.VK_R);
+		reset.addActionListener(new ResetListener());
+		this.setJMenuBar(menu);
+		menu.add(file);
+		file.add(reset);
+		
 		// Panels
 		main_pnl.setBackground(new Color(0x8888FF));
 
@@ -58,6 +86,7 @@ public class GUI extends JFrame {
 		output_txt.setLineWrap(true);
 		output_txt.setBackground(new Color(0xFFFFA8));
 		output_txt.setBorder(new LineBorder(new Color(0x000044)));
+		output_txt.addMouseListener(this);
 
 		// Buttons
 		swap_btn.addActionListener(new SwapListener());
@@ -73,6 +102,9 @@ public class GUI extends JFrame {
 		addComponent(main_pnl, swap_btn, 0, 4, 1, 1, CENTER);
 		addComponent(main_pnl, translate_btn, 1, 4, 1, 1, CENTER);
 		addComponent(main_pnl, dictionary_btn, 2, 4, 1, 1, CENTER);
+
+		mode = State.ENCODE;
+		clipboard = "";
 	}
 
 	private void addComponent(JPanel p, JComponent c, int x, int y, int width,
@@ -98,11 +130,22 @@ public class GUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (translate_btn.getText().equalsIgnoreCase("Encode")) {
+			if (mode == State.ENCODE) {
 				translate_btn.setText("Decode");
+				mode = State.DECODE;
+
 			} else {
 				translate_btn.setText("Encode");
+				mode = State.ENCODE;
 			}
+
+			String tmp = input_txt.getText();
+			input_txt.setText(output_txt.getText());
+			output_txt.setText(tmp);
+			
+			tmp = input_lbl.getText();
+			input_lbl.setText(output_lbl.getText());
+			output_lbl.setText(tmp);
 		}
 	}
 
@@ -110,12 +153,25 @@ public class GUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (translate_btn.getText().equalsIgnoreCase("Encode")) {
+			if (mode == State.ENCODE) {
 				output_txt.setText(translator.encode(input_txt.getText()));
 			}
-			if (translate_btn.getText().equalsIgnoreCase("Decode")) {
+			if (mode == State.DECODE) {
 				output_txt.setText(translator.decode(input_txt.getText()));
 			}
+		}
+	}
+	
+	class ResetListener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			input_lbl.setText("Input English plain-text");
+			output_lbl.setText("Output Morse Code");
+			translate_btn.setText("Encode");
+			mode = State.ENCODE;
+			clipboard = "";
+			input_txt.setText("");
+			output_txt.setText("");
 		}
 	}
 
@@ -125,5 +181,41 @@ public class GUI extends JFrame {
 			new Lookup();
 
 		}
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		int mouseButton = e.getButton();
+
+		if (mouseButton == MouseEvent.BUTTON1) {
+			input_txt.append(clipboard);
+
+		} else if (mouseButton == MouseEvent.BUTTON2) {
+			// Center Mouse Click
+
+		} else if (mouseButton == MouseEvent.BUTTON3) {
+			// Right Mouse Click
+			clipboard = output_txt.getText();
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+
 	}
 }

@@ -56,9 +56,8 @@ public class Dictionary {
 		String out = "Char\tSequence\n";
 		Dictionary dict = new Dictionary();
 		for (int i = 0; i < dict.getSize(); i++) {
-			out += String.format("%3s\t%s\n",
-					Character.toString(getDictionary().get(i).getCharacter()),
-					getDictionary().get(i).getSequence());
+			out += String.format(" '%c'\t%s\n", getDictionary().get(i)
+					.getCharacter(), getDictionary().get(i).getSequence());
 		}
 		return out;
 	}
