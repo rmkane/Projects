@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class AnagramSolver {
@@ -16,6 +18,7 @@ public class AnagramSolver {
 		System.out.print("Jumbled letters: ");
 		String letters = new Scanner(System.in).nextLine();
 		solve(letters);
+		sort();
 		print();
 	}
 
@@ -75,17 +78,20 @@ public class AnagramSolver {
 			// there is at least one 0 then the word will be invalid, because
 			// it has to be composed of every letter in the whitelist.
 			ArrayList<Integer> valid = new ArrayList<Integer>();
+			ArrayList<Character> temp = new ArrayList<Character>();
+			temp.addAll(whitelist);
 			// Loop to compare each letter in the selected word
 			loop: for (int d = 0; d < getDictionary().get(i).length(); d++) {
 				int match = 0; // Default value of 0 until proven true
 				// Compare each whitelist letter to each letter of the
 				// selected word.
-				for (int c = 0; c < whitelist.size(); c++) {
+				for (int c = 0; c < temp.size(); c++) {
 					match = 0; // Reassign the value 0.
-					if (getDictionary().get(i).charAt(d) == whitelist.get(c)) {
+					if (getDictionary().get(i).charAt(d) == temp.get(c)) {
 						// If the selected word contains a letter from the
 						// whitelist then verify a match and move on to the next
 						// letter in the word/
+						temp.remove(c);
 						match = 1;
 						continue loop;
 					}
@@ -98,10 +104,24 @@ public class AnagramSolver {
 			}
 			if (checksum == 1
 					&& getDictionary().get(i).length() <= whitelist.size()
-					&& getDictionary().get(i).length() > 3) {
+					&& getDictionary().get(i).length() > 2) {
 				found.add(getDictionary().get(i));
 			}
 		}
+	}
+	
+	private void sort() {
+		Collections.sort(found, new Comparator<String>() {
+		    public int compare(String x, String y) {
+		        if(x.length() > y.length()) {
+		            return -1;
+		        } else if(x.length() == y.length()) {
+		            return 0;
+		        } else {
+		            return 1;
+		        }
+		    }
+		});
 	}
 
 	// Prints the list of anagrams for a given set of letters
