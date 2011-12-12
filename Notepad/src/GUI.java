@@ -27,6 +27,7 @@ public class GUI extends JFrame {
 			paste, manual, about;
 	private JPanel main_pnl;
 	private JTabbedPane tab;
+	private String clipboard;
 
 	public GUI() {
 		init();
@@ -39,6 +40,7 @@ public class GUI extends JFrame {
 	}
 
 	private void init() {
+		clipboard = "";
 		menu();
 		components();
 	}
@@ -84,10 +86,13 @@ public class GUI extends JFrame {
 		close.addActionListener(new CloseAction());
 		exit.addActionListener(new ExitAction());
 		properties.addActionListener(new PropertiesAction());
+		cut.addActionListener(new CutAction());
+		copy.addActionListener(new CopyAction());
+		paste.addActionListener(new PasteAction());
 		manual.addActionListener(new ManualAction());
 		about.addActionListener(new AboutAction());
 
-		this.setJMenuBar(menu);
+		// Nest menus
 		menu.add(file);
 		menu.add(edit);
 		menu.add(help);
@@ -101,14 +106,15 @@ public class GUI extends JFrame {
 		edit.add(paste);
 		help.add(manual);
 		help.add(about);
+		this.setJMenuBar(menu);
 	}
 
 	private void components() {
 		main_pnl = new JPanel(new BorderLayout());
 		tab = new JTabbedPane();
 		tab.addTab("New", new TabPanel());
-		this.add(main_pnl);
 		main_pnl.add(tab);
+		this.add(main_pnl);
 	}
 
 	private class NewAction implements ActionListener {
@@ -150,6 +156,7 @@ public class GUI extends JFrame {
 				TabPanel panel = new TabPanel();
 				panel.setText(text);
 				tab.addTab(filename, panel);
+				tab.setSelectedIndex(tab.getTabCount() - 1);
 			}
 		}
 
@@ -222,6 +229,24 @@ public class GUI extends JFrame {
 	private class ExitAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
+			for (int i = tab.getTabCount() - 1; i >= 0; i--) {
+				String filename = tab.getTitleAt(i);
+				int response = JOptionPane
+						.showConfirmDialog(null,
+								"Do you want to save the changes you made to\n"
+										+ filename + "?", PROGRAM_NAME,
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE);
+				if (response == JOptionPane.NO_OPTION) {
+					// Don't save
+					tab.remove(i);
+				} else if (response == JOptionPane.YES_OPTION) {
+					new SaveAction().save();
+					tab.remove(i);
+				} else if (response == JOptionPane.CLOSED_OPTION) {
+					// Close canceled
+				}
+			}
 			System.exit(0);
 		}
 
@@ -234,6 +259,33 @@ public class GUI extends JFrame {
 			// Allow user to change font for all tabs.
 		}
 
+	}
+
+	private class CutAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			clipboard = ((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
+					.getSelectedText();
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).setSelectedText();
+		}
+
+	}
+
+	private class CopyAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			clipboard = ((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
+					.getSelectedText();
+		}
+
+	}
+
+	private class PasteAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
+					.insert(clipboard);
+		}
 	}
 
 	private class ManualAction implements ActionListener {
