@@ -2,10 +2,11 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
@@ -121,6 +122,7 @@ public class GUI extends JFrame {
 
 		public void actionPerformed(ActionEvent e) {
 			tab.addTab("New", new TabPanel());
+			tab.setSelectedIndex(tab.getTabCount() - 1);
 		}
 
 	}
@@ -138,15 +140,13 @@ public class GUI extends JFrame {
 			// if the user clicked OK, we have "APPROVE_OPTION"
 			// so we want to open the file
 			if (option == JFileChooser.APPROVE_OPTION) {
-				String filename = "";
+				String filename = open.getSelectedFile().getPath();
 				String text = "";
 				try {
 					// create a scanner to read the file
 					// (getSelectedFile().getPath() will get the path to the
 					// file)
-					Scanner scan = new Scanner(new FileReader(open
-							.getSelectedFile().getPath()));
-					filename = open.getSelectedFile().getPath();
+					Scanner scan = new Scanner(new FileReader(filename));
 					while (scan.hasNext()) {
 						text += scan.nextLine() + "\n";
 					}
@@ -176,13 +176,11 @@ public class GUI extends JFrame {
 			int option = save.showSaveDialog(null);
 
 			if (option == JFileChooser.APPROVE_OPTION) {
-				String filename = "";
+				String filename = save.getSelectedFile().getPath();
 				String text = "";
 				try {
 					// create a buffered writer to write to a file
-					BufferedWriter out = new BufferedWriter(new FileWriter(save
-							.getSelectedFile().getPath()));
-					filename = save.getSelectedFile().getPath();
+					PrintWriter out = new PrintWriter(new FileWriter(filename));
 					text = ((TabPanel) tab.getComponentAt(tab
 							.getSelectedIndex())).getText();
 					tab.setTitleAt(tab.getSelectedIndex(), filename);
@@ -214,7 +212,22 @@ public class GUI extends JFrame {
 				// Don't save
 				tab.remove(tab.getSelectedIndex());
 			} else if (response == JOptionPane.YES_OPTION) {
-				new SaveAction().save();
+				if (filename.equalsIgnoreCase("New")) {
+					new SaveAction().save();
+				} else {
+					try {
+						PrintWriter out = new PrintWriter(new FileWriter(
+								filename));
+						String text = ((TabPanel) tab.getComponentAt(tab
+								.getSelectedIndex())).getText();
+						tab.setTitleAt(tab.getSelectedIndex(), filename);
+						out.write(text);
+						// write the contents of the TextArea to the file
+						out.close(); // close the file stream
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				tab.remove(tab.getSelectedIndex());
 			} else if (response == JOptionPane.CLOSED_OPTION) {
 				// Close canceled
@@ -266,7 +279,8 @@ public class GUI extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			clipboard = ((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
 					.getSelectedText();
-			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).setSelectedText();
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
+					.deleteSelectedText();
 		}
 
 	}

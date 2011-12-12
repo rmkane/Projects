@@ -43,7 +43,7 @@ public class TabPanel extends JPanel {
 		return text_area.getText();
 	}
 
-	public void setSelectedText() {
+	public void deleteSelectedText() {
 		String from = text_area.getText();
 		int start = text_area.getText().indexOf(from);
 		if (start >= 0 && from.length() > 0) {
