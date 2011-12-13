@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
 
+@SuppressWarnings("all")
 public class AnagramSolver {
 
 	private ArrayList<String> dictionary;
@@ -54,7 +55,7 @@ public class AnagramSolver {
 	// Reads in a dictionary text file
 	private void readFile() {
 		try {
-			File file = new File("src/resources/dictionary.txt");
+			File file = new File("src/resources/scrabble.txt");
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNextLine()) {
 				dictionary.add(scanner.nextLine());
@@ -109,7 +110,7 @@ public class AnagramSolver {
 			}
 		}
 	}
-	
+
 	private void sort() {
 		Collections.sort(found, new Comparator<String>() {
 		    public int compare(String x, String y) {
