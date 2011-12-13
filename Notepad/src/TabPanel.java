@@ -29,12 +29,12 @@ public class TabPanel extends JPanel {
 	public TabPanel() {
 		// Initialize variables
 		clipboard = "";
-		font_name = Font.MONOSPACED;
+		font_name = "Courier New";
 		font_style = Font.PLAIN;
 		font_size = 12;
 		font = new Font(font_name, font_style, font_size);
 		font_color = Color.GREEN;
-		bg_color = Color.BLACK;
+		bg_color = Color.RED;
 		
 		// Initialize and add JComponents to JPanel
 		this.setLayout(new BorderLayout());
@@ -44,6 +44,7 @@ public class TabPanel extends JPanel {
 		text_area.setFont(font);
 		text_area.setForeground(font_color);
 		text_area.setBackground(bg_color);
+		text_area.setCaretColor(Color.WHITE);
 		scroll = new JScrollPane(text_area);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		this.add(scroll);
@@ -85,8 +86,8 @@ public class TabPanel extends JPanel {
 	}
 
 	public void deleteSelectedText() {
-		String from = text_area.getText();
-		int start = from.indexOf(from);
+		String from = text_area.getSelectedText();
+		int start = text_area.getText().indexOf(from);
 		if (start >= 0 && from.length() > 0) {
 			text_area.replaceRange("", start, start + from.length());
 		}
@@ -105,8 +106,7 @@ public class TabPanel extends JPanel {
 	}
 
 	public void updateFont() {
-		font = new Font(font_name, font_style, font_size);
-		text_area.setFont(font);
+		text_area.setFont(new Font(font_name, font_style, font_size));
 	}
 
 	public String getFont_name() {
@@ -125,8 +125,8 @@ public class TabPanel extends JPanel {
 		this.font_style = font_style;
 	}
 
-	public int getFont_size() {
-		return font_size;
+	public String getFont_size() {
+		return Integer.toString(font_size);
 	}
 
 	public void setFont_size(int font_size) {

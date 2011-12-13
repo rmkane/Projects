@@ -40,6 +40,9 @@ public class GUI extends JFrame {
 			bg_color_box;
 
 	private JTabbedPane tab;
+	private int tab_count;
+	
+	@SuppressWarnings("unused") // Hehehe :)
 	private String clipboard;
 
 	public GUI() {
@@ -54,6 +57,7 @@ public class GUI extends JFrame {
 
 	private void init() {
 		clipboard = "";
+		tab_count = 0;
 		menu();
 		components();
 	}
@@ -159,7 +163,7 @@ public class GUI extends JFrame {
 		this.add(toolbar, BorderLayout.PAGE_START);
 
 		tab = new JTabbedPane();
-		tab.addTab("New", new TabPanel());
+		tab.addTab("New Document #" + ++tab_count, new TabPanel());
 		main_pnl.add(tab);
 		this.add(main_pnl, BorderLayout.CENTER);
 		
@@ -229,7 +233,7 @@ public class GUI extends JFrame {
 	private class NewAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			tab.addTab("New", new TabPanel());
+			tab.addTab("New Document #" + ++tab_count, new TabPanel());
 			tab.setSelectedIndex(tab.getTabCount() - 1);
 		}
 
@@ -320,7 +324,7 @@ public class GUI extends JFrame {
 				// Don't save
 				tab.remove(tab.getSelectedIndex());
 			} else if (response == JOptionPane.YES_OPTION) {
-				if (filename.equalsIgnoreCase("New")) {
+				if (filename.substring(0,  3).equalsIgnoreCase("New")) {
 					new SaveAction().save();
 				} else {
 					try {
