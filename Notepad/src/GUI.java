@@ -1,4 +1,9 @@
 import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -9,8 +14,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -26,7 +34,11 @@ public class GUI extends JFrame {
 	private JMenu file, edit, help;
 	private JMenuItem new_, open, save, close, exit, properties, cut, copy,
 			paste, manual, about;
-	private JPanel main_pnl;
+	private JPanel main_pnl, toolbar, font_toolbar;
+	private JLabel font_name_lbl, font_size_lbl, font_color_lbl, bg_color_lbl;
+	private JComboBox font_name_box, font_size_box, font_color_box,
+			bg_color_box;
+
 	private JTabbedPane tab;
 	private String clipboard;
 
@@ -111,11 +123,107 @@ public class GUI extends JFrame {
 	}
 
 	private void components() {
+		this.setLayout(new BorderLayout());
+		toolbar = new JPanel(new BorderLayout());
+		font_toolbar = new JPanel(new GridBagLayout());
 		main_pnl = new JPanel(new BorderLayout());
+
+		font_name_lbl = new JLabel("Font");
+		font_name_box = new JComboBox(getAvailableFonts());
+		font_name_box.addActionListener(new FontNameAction());
+		font_size_lbl = new JLabel("Size");
+		font_size_box = new JComboBox(getFontSizes());
+		font_size_box.addActionListener(new FontSizeAction());
+		font_color_lbl = new JLabel("Color");
+		font_color_box = new JComboBox();
+		bg_color_lbl = new JLabel("Background");
+		bg_color_box = new JComboBox();
+
+		addComponent(font_toolbar, font_name_lbl, 0, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, font_name_box, 1, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, font_size_lbl, 2, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, font_size_box, 3, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, font_color_lbl, 4, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, font_color_box, 5, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, bg_color_lbl, 6, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		addComponent(font_toolbar, bg_color_box, 7, 0, 1, 1,
+				GridBagConstraints.LINE_START);
+		toolbar.add(font_toolbar, BorderLayout.WEST);
+		this.add(toolbar, BorderLayout.PAGE_START);
+
 		tab = new JTabbedPane();
 		tab.addTab("New", new TabPanel());
 		main_pnl.add(tab);
-		this.add(main_pnl);
+		this.add(main_pnl, BorderLayout.CENTER);
+		
+		font_name_box.setSelectedItem(((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).getFont_name());
+		font_size_box.setSelectedItem(((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).getFont_size());
+	}
+
+	private void addComponent(JPanel panel, JComponent component, int xPos,
+			int yPos, int width, int height, int align) {
+		GridBagConstraints grid = new GridBagConstraints();
+		grid.gridx = xPos;
+		grid.gridy = yPos;
+		grid.gridwidth = width;
+		grid.gridheight = height;
+		grid.anchor = align;
+		grid.insets = new Insets(3, 3, 3, 3);
+		grid.fill = GridBagConstraints.NONE;
+		panel.add(component, grid);
+	}
+
+	public String[] getAvailableFonts() {
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		Font[] fonts = ge.getAllFonts();
+		String[] font_names = new String[fonts.length];
+		for (int f = 0; f < font_names.length; f++) {
+			font_names[f] = fonts[f].getFontName();
+		}
+		return font_names;
+	}
+	
+	public int getFontIndex() {
+		String[] font_names = getAvailableFonts();
+		int index = 0;
+		for (int f = 0; f < font_names.length; f++) {
+			if (font_names[f].equalsIgnoreCase(((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).getFont_name())) {
+				index = f;
+			}
+		}
+		return index;
+	}
+
+	public String[] getFontSizes() {
+		String[] sizes = { "8", "9", "10", "11", "12", "14", "16", "18", "20",
+				"22", "24", "26", "28", "36", "48", "72" };
+		return sizes;
+	}
+	
+	private class FontNameAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).setFont_name((String)font_name_box.getSelectedItem());
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).updateFont();
+		}
+
+	}
+	
+	private class FontSizeAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).setFont_size(Integer.parseInt((String) font_size_box.getSelectedItem()));
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).updateFont();
+		}
+
 	}
 
 	private class NewAction implements ActionListener {
@@ -277,10 +385,7 @@ public class GUI extends JFrame {
 	private class CutAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			clipboard = ((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
-					.getSelectedText();
-			((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
-					.deleteSelectedText();
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).cut();
 		}
 
 	}
@@ -288,8 +393,7 @@ public class GUI extends JFrame {
 	private class CopyAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			clipboard = ((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
-					.getSelectedText();
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).copy();
 		}
 
 	}
@@ -297,8 +401,7 @@ public class GUI extends JFrame {
 	private class PasteAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			((TabPanel) tab.getComponentAt(tab.getSelectedIndex()))
-					.insert(clipboard);
+			((TabPanel) tab.getComponentAt(tab.getSelectedIndex())).paste();
 		}
 	}
 
