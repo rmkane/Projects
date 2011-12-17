@@ -143,22 +143,15 @@ public class GUI extends JFrame {
 		bg_color_lbl = new JLabel("Background");
 		bg_color_box = new JComboBox();
 
-		addComponent(font_toolbar, font_name_lbl, 0, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, font_name_box, 1, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, font_size_lbl, 2, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, font_size_box, 3, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, font_color_lbl, 4, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, font_color_box, 5, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, bg_color_lbl, 6, 0, 1, 1,
-				GridBagConstraints.LINE_START);
-		addComponent(font_toolbar, bg_color_box, 7, 0, 1, 1,
-				GridBagConstraints.LINE_START);
+		final int START = GridBagConstraints.LINE_START;
+		addComponent(font_toolbar, font_name_lbl, 0, 0, 1, 1, START);
+		addComponent(font_toolbar, font_name_box, 1, 0, 1, 1, START);
+		addComponent(font_toolbar, font_size_lbl, 2, 0, 1, 1, START);
+		addComponent(font_toolbar, font_size_box, 3, 0, 1, 1, START);
+		addComponent(font_toolbar, font_color_lbl, 4, 0, 1, 1, START);
+		addComponent(font_toolbar, font_color_box, 5, 0, 1, 1, START);
+		addComponent(font_toolbar, bg_color_lbl, 6, 0, 1, 1, START);
+		addComponent(font_toolbar, bg_color_box, 7, 0, 1, 1, START);
 		toolbar.add(font_toolbar, BorderLayout.WEST);
 		this.add(toolbar, BorderLayout.PAGE_START);
 

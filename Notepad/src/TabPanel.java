@@ -34,7 +34,7 @@ public class TabPanel extends JPanel {
 		font_size = 12;
 		font = new Font(font_name, font_style, font_size);
 		font_color = Color.GREEN;
-		bg_color = Color.RED;
+		bg_color = Color.BLACK;
 		
 		// Initialize and add JComponents to JPanel
 		this.setLayout(new BorderLayout());
@@ -76,6 +76,7 @@ public class TabPanel extends JPanel {
 	}
 	
 	public void paste() {
+		if (text_area.getSelectedText() != null) deleteSelectedText();
 		text_area.insert(clipboard, text_area.getCaretPosition());
 	}
 	
